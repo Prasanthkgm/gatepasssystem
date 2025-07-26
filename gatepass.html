@@ -1,0 +1,218 @@
+
+ <!DOCTYPE html> 
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Romeo's Digital Business Card</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #4e54c8, #8f94fb);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        .header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+        }
+
+        h2 {
+            font-size: 28px;
+            background: linear-gradient(90deg, #ff6a00, #ee0979, #ff6a00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        #themeToggle {
+            padding: 8px 16px;
+            font-weight: bold;
+            background: #333;
+            color: #fff;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        form {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.2);
+            max-width: 400px;
+            width: 90%;
+            margin-top: 20px;
+        }
+
+        input, button {
+            width: 90%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: none;
+            font-size: 15px;
+        }
+
+        input {
+            background: rgba(255,255,255,0.9);
+        }
+
+        button {
+            background: linear-gradient(90deg, #36d1dc, #5b86e5);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        #output {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 20px;
+            border-radius: 15px;
+            color: white;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            margin-top: 25px;
+            display: none;
+        }
+
+        #output img {
+            border-radius: 50%;
+            margin-bottom: 10px;
+        }
+
+        .dark-mode {
+            background: linear-gradient(135deg, #000000, #434343);
+            color: white;
+        }
+
+        #toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            display: none;
+        }
+
+        a {
+            color: #0f0;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h2>RapidPass - Digital Business Card</h2>
+        <button id="themeToggle">🌙 Theme</button>
+    </div>
+
+    <form id="detailsForm">
+        <input type="text" id="name" placeholder="Enter Your Name" required><br>
+        <input type="text" id="number" placeholder="Enter Mobile Number" required><br>
+        <input type="text" id="position" placeholder="Enter Your Position" required><br>
+        <input type="email" id="email" placeholder="Enter Your Email"><br>
+        <input type="url" id="website" placeholder="Your Website/LinkedIn"><br>
+        <input type="time" id="outTime" placeholder="Out Time" required><br>
+        <input type="time" id="inTime" placeholder="In Time" required><br>
+        <input type="text" id="reason" placeholder="Reason for Gatepass" required><br>
+        <input type="file" id="photo" accept="image/*" required><br>
+        <button type="submit">Generate Business Card</button>
+        <button type="reset" style="background: #dc3545;">Reset Form</button>
+    </form>
+
+    <div id="output">
+        <div id="photoContainer"></div>
+        <h3 id="displayName"></h3>
+        <p id="displayPosition"></p>
+        <p id="displayNumber"></p>
+        <p id="displayReason"></p>
+        <p id="displayOutIn"></p>
+        <p id="displayEmail"></p>
+        <p id="displayWebsite"></p>
+        <div id="qrcode"></div>
+        <a id="downloadLink" href="#" download="my_qr.png">Download QR Code</a><br><br>
+    </div>
+
+    <div id="toast">Business Card Generated Successfully!</div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script>
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+        });
+
+        document.getElementById('detailsForm').addEventListener('submit', function(e){
+            e.preventDefault();
+
+            const name = document.getElementById('name').value;
+            const number = document.getElementById('number').value;
+            const position = document.getElementById('position').value;
+            const email = document.getElementById('email').value;
+            const website = document.getElementById('website').value;
+            const outTime = document.getElementById('outTime').value;
+            const inTime = document.getElementById('inTime').value;
+            const reason = document.getElementById('reason').value;
+            const photoFile = document.getElementById('photo').files[0];
+
+            const outputDiv = document.getElementById('output');
+            const photoContainer = document.getElementById('photoContainer');
+            const qrDiv = document.getElementById('qrcode');
+            const downloadLink = document.getElementById('downloadLink');
+
+            photoContainer.innerHTML = '';
+            qrDiv.innerHTML = '';
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                photoContainer.innerHTML = `<img src="${e.target.result}" alt="Photo" width="120" height="120">`;
+            }
+            reader.readAsDataURL(photoFile);
+
+            document.getElementById('displayName').textContent = name;
+            document.getElementById('displayPosition').textContent = position;
+            document.getElementById('displayNumber').textContent = `📞 ${number}`;
+            document.getElementById('displayEmail').textContent = `📧 ${email}`;
+            document.getElementById('displayWebsite').innerHTML = website ? `🌐 <a href="${website}" target="_blank">${website}</a>` : '';
+            document.getElementById('displayReason').textContent = `🎯 Reason: ${reason}`;
+            document.getElementById('displayOutIn').textContent = `🕒 Out: ${outTime} | In: ${inTime}`;
+
+            const qrText = `Name: ${name}\nPosition: ${position}\nMobile: ${number}\nEmail: ${email}\nWebsite: ${website}\nOut: ${outTime}\nIn: ${inTime}\nReason: ${reason}`;
+            new QRCode(qrDiv, {
+                text: qrText,
+                width: 128,
+                height: 128
+            });
+
+            outputDiv.style.display = 'block';
+
+            setTimeout(() => {
+                const canvas = qrDiv.querySelector('canvas');
+                if (canvas) {
+                    downloadLink.href = canvas.toDataURL('image/png');
+                }
+            }, 500);
+
+            const toast = document.getElementById('toast');
+            toast.style.display = 'block';
+            setTimeout(() => toast.style.display = 'none', 3000);
+        });
+    </script>
+</body>
+</html> 
+
